@@ -26,8 +26,10 @@ window.onload = async () => {
   ctx = canvas.getContext('2d')
   const heroImg = await loadTexture('assets/player.png')
   const enemyImg = await loadTexture('assets/enemyShip.png')
+  const starBackground = await loadTexture('assets/starBackground.png')
 
-  ctx.fillStyle = 'black'
+  const pattern = ctx.createPattern(starBackground, 'repeat')
+  ctx.fillStyle = pattern
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   ctx.drawImage(
