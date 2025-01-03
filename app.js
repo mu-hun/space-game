@@ -8,7 +8,7 @@ function loadTexture(path) {
   })
 }
 
-function createEnemies(ctx, canvas, enemyImg) {
+function createEnemies1(ctx, canvas, enemyImg) {
   const MONSTER_TOTAL = 5
   const MONSTER_WIDTH = MONSTER_TOTAL * 98
   const START_X = (canvas.width - MONSTER_WIDTH) / 2
@@ -17,6 +17,22 @@ function createEnemies(ctx, canvas, enemyImg) {
   for (let x = START_X; x < STOP_X; x += 98) {
     for (let y = 0; y < 50 * 5; y += 50) {
       ctx.drawImage(enemyImg, x, y)
+    }
+  }
+}
+
+function createEnemies2(ctx, canvas, enemyImg) {
+  const MONSTER_TOTAL = 5
+  const MONSTER_WIDTH = MONSTER_TOTAL * 98
+  const START_X = (canvas.width - MONSTER_WIDTH) / 2
+
+  for (let row = 0; row < MONSTER_TOTAL; row++) {
+    const numEnemies = MONSTER_TOTAL - row
+    const rowWidth = numEnemies * 98
+    const rowStartX = (canvas.width - rowWidth) / 2
+
+    for (let x = rowStartX; x < rowStartX + rowWidth; x += 98) {
+      ctx.drawImage(enemyImg, x, row * 50)
     }
   }
 }
@@ -37,5 +53,5 @@ window.onload = async () => {
     canvas.width / 2 - 45,
     canvas.height - canvas.height / 4
   )
-  createEnemies(ctx, canvas, enemyImg)
+  createEnemies2(ctx, canvas, enemyImg)
 }
