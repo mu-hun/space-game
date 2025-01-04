@@ -12,3 +12,32 @@ export function loadTexture(path) {
     }
   })
 }
+
+export class EventEmitter {
+  constructor() {
+    this.listeners = {}
+  }
+
+  /**
+   *
+   * @param {string} message
+   * @param {Function} listener
+   */
+  on(message, listener) {
+    if (!this.listeners[message]) {
+      this.listeners[message] = []
+    }
+    this.listeners[message].push(listener)
+  }
+
+  /**
+   *
+   * @param {string} message
+   * @param {unknown} payload
+   */
+  emit(message, payload = null) {
+    if (this.listeners[message]) {
+      this.listeners[message].forEach((l) => l(message, payload))
+    }
+  }
+}
