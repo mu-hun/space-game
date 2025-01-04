@@ -1,6 +1,7 @@
 import { EventEmitter } from './utils.js'
 
 import { starBackground } from './assets/index.js'
+import Entity from './entities/entity.js'
 import createEnemies, { FORMATION_TYPE } from './entities/createEnemies.js'
 import createPlayer from './entities/createPlayer.js'
 
@@ -13,6 +14,12 @@ const KEY_ACTIONS = {
   ArrowDown: 'ArrowDown',
   ArrowLeft: 'ArrowLeft',
   ArrowRight: 'ArrowRight',
+  ' ': 'Space',
+}
+
+const COLLISION_EVENTS = {
+  ENEMY_LASER: 'ENEMY_LASER',
+  ENEMY_PLAYER: 'ENEMY_PLAYER',
 }
 
 window.addEventListener('keydown', (event) => {
@@ -80,7 +87,9 @@ window.onload = async () => {
   const ctx = canvas.getContext('2d')
 
   function drawEntities() {
-    entities.forEach((entity) => entity.draw(ctx))
+    for (const entity of entities) {
+      entity.draw(ctx)
+    }
   }
 
   ;(function gameLoop() {

@@ -7,3 +7,4 @@ export const enemyImg = await loadTexture(
 export const starBackground = await loadTexture(
   import.meta.resolve('./starBackground.png')
 )
+export const laserImg = await loadTexture(import.meta.resolve('./laserRed.png'))
