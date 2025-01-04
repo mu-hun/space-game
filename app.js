@@ -5,6 +5,8 @@ import Entity from './entities/entity.js'
 import createEnemies, { FORMATION_TYPE } from './entities/createEnemies.js'
 import createPlayer from './entities/createPlayer.js'
 
+import * as gameStatus from './gameStatus.js'
+
 import CANVAS_SIZE from './canvasSize.js'
 
 const eventEmitter = new EventEmitter()
@@ -15,11 +17,20 @@ const KEY_ACTIONS = {
   ArrowLeft: 'ArrowLeft',
   ArrowRight: 'ArrowRight',
   ' ': 'Space',
+  Enter: 'Enter',
 }
 
 const COLLISION_EVENTS = {
   ENEMY_DESTROY: 'ENEMY_DESTROY',
   PLAYER_COLLIDES_WITH_ENEMY: 'PLAYER_COLLIDES_WITH_ENEMY',
+}
+
+const STAGE_EVENTS = {
+  RESET: 'RESET',
+  // TODO: 아래 단계 추가하기
+  // EASY: 'EASY',
+  // MEDIUM: 'MEDIUM',
+  // HARD: 'HARD',
 }
 
 window.addEventListener('keydown', (event) => {
@@ -95,11 +106,38 @@ function updateEntities() {
 eventEmitter.on(COLLISION_EVENTS.ENEMY_DESTROY, async (_, [laser, enemy]) => {
   laser.destroy()
   await enemy.destroy()
+
+  player.incrementPoints()
+
+  if (isEnemiesAllDead()) {
+    eventEmitter.emit(gameStatus.RESULT.WIN)
+  }
 })
 
-eventEmitter.on(COLLISION_EVENTS.PLAYER_COLLIDES_WITH_ENEMY, (_, [enemy]) => {
-  // TODO: handle player life
+eventEmitter.on(
+  COLLISION_EVENTS.PLAYER_COLLIDES_WITH_ENEMY,
+  async (_, [enemy]) => {
+    if (enemy.isDestroying()) return
+    await enemy.destroy()
+
+    player.decrementLife()
+
+    if (player.dead && !isEnemiesAllDead()) {
+      eventEmitter.emit(gameStatus.RESULT.LOSE)
+    }
+  }
+)
+
+eventEmitter.on(KEY_ACTIONS.Enter, () => {
+  if (player.dead || isEnemiesAllDead()) {
+    eventEmitter.emit(STAGE_EVENTS.RESET)
+  }
 })
+
+const isEnemiesAllDead = () =>
+  entities
+    .filter((entity) => entity.type === 'Enemy')
+    .every((enemy) => enemy.dead)
 
 let entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
 
@@ -120,13 +158,32 @@ window.onload = async () => {
     player.drawAutoFire(ctx)
   }
 
-  ;(function gameLoop() {
+  let requestId = null
+
+  function gameLoop() {
     const pattern = ctx.createPattern(starBackground, 'repeat')
     ctx.fillStyle = pattern
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     drawEntities()
     updateEntities()
+    gameStatus.drawLife(ctx, player.life)
+    gameStatus.drawPoints(ctx, player.points)
 
-    requestAnimationFrame(gameLoop)
-  })()
+    requestId = requestAnimationFrame(gameLoop)
+  }
+  gameLoop()
+
+  eventEmitter.on(gameStatus.RESULT.WIN, () => {
+    gameStatus.endGame(ctx, gameStatus.RESULT.WIN, requestId)
+  })
+
+  eventEmitter.on(gameStatus.RESULT.LOSE, () => {
+    gameStatus.endGame(ctx, gameStatus.RESULT.LOSE, requestId)
+  })
+
+  eventEmitter.on(STAGE_EVENTS.RESET, () => {
+    player.reset()
+    entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
+    requestId = requestAnimationFrame(gameLoop)
+  })
 }

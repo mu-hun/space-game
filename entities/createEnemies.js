@@ -34,6 +34,10 @@ class Enemy extends Entity {
       }, timeout)
     })
   }
+
+  isDestroying() {
+    return this.img === laserGreenShot || this.dead
+  }
 }
 
 const MAX_PER_ROW = 5

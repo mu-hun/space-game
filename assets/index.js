@@ -11,3 +11,4 @@ export const laserImg = await loadTexture(import.meta.resolve('./laserRed.png'))
 export const laserGreenShot = await loadTexture(
   import.meta.resolve('./laserGreenShot.png')
 )
+export const lifeImg = await loadTexture(import.meta.resolve('./life.png'))

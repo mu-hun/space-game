@@ -7,19 +7,51 @@ import CANVAS_SIZE from '../canvasSize.js'
 const timeout = 200
 
 class Player extends Entity {
-  constructor(x, y) {
+  constructor() {
+    const [x, y] = getInitialPosition()
     super(x, y)
+
     this.width = 99
     this.height = 75
 
     this.type = 'Player'
 
     this.speed = { x: 0, y: 0 }
+    this.img = playerImg
 
     this.cooldown = 0
 
     this.leftLaser = []
     this.rightLaser = []
+
+    this.life = 3
+    this.points = 0
+  }
+
+  reset() {
+    this.dead = false
+
+    const [x, y] = getInitialPosition()
+    this.x = x
+    this.y = y
+
+    this.cooldown = 0
+
+    this.leftLaser = []
+    this.rightLaser = []
+
+    this.life = 3
+    this.points = 0
+  }
+
+  decrementLife() {
+    this.life--
+    if (this.life === 0) {
+      this.dead = true
+    }
+  }
+  incrementPoints() {
+    this.points += 100
   }
 
   fire() {
@@ -69,11 +101,13 @@ class Player extends Entity {
   }
 }
 
-export default function createPlayer() {
-  const player = new Player(
+function getInitialPosition() {
+  return [
     CANVAS_SIZE.WIDTH / 2 - 45,
-    CANVAS_SIZE.HEIGHT - CANVAS_SIZE.HEIGHT / 4
-  )
-  player.img = playerImg
-  return player
+    CANVAS_SIZE.HEIGHT - CANVAS_SIZE.HEIGHT / 4,
+  ]
+}
+
+export default function createPlayer() {
+  return new Player()
 }
