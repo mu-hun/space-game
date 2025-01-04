@@ -10,11 +10,12 @@ class Enemy extends Entity {
     super(x, y)
     this.width = 98
     this.height = 50
+    this.speed = { x: 0, y: 5 }
 
     this.type = 'Enemy'
     let id = setInterval(() => {
       if (this.y < CANVAS_SIZE.HEIGHT - this.height || this.dead) {
-        this.y += 5
+        this.y += 5 + this.speed.y
       } else {
         this.y = CANVAS_SIZE.HEIGHT
         clearInterval(id)

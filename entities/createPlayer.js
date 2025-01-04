@@ -16,7 +16,7 @@ class Player extends Entity {
 
     this.type = 'Player'
 
-    this.speed = { x: 0, y: 0 }
+    this.speed = { x: 20, y: 20 }
     this.img = playerImg
 
     this.cooldown = 0
