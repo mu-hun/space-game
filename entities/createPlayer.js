@@ -5,6 +5,7 @@ import { playerImg } from '../assets/index.js'
 import CANVAS_SIZE from '../canvasSize.js'
 
 const timeout = 200
+const MAX_LIFE = 4
 
 class Player extends Entity {
   constructor() {
@@ -56,6 +57,10 @@ class Player extends Entity {
   }
   incrementPoints() {
     this.points += 100
+
+    if (this.points % 3 === 0 && this.life < MAX_LIFE) {
+      this.life += 1
+    }
   }
 
   fire() {

@@ -7,9 +7,9 @@ import CANVAS_SIZE from './canvasSize.js'
  * @param {number} life
  */
 export function drawLife(ctx, life) {
-  const START_POS = CANVAS_SIZE.WIDTH - 180
+  const START_POS = CANVAS_SIZE.WIDTH
   for (let i = 0; i < life; i++) {
-    ctx.drawImage(lifeImg, START_POS + 45 * (i + 1), CANVAS_SIZE.HEIGHT - 37)
+    ctx.drawImage(lifeImg, START_POS - 45 * (i + 1), CANVAS_SIZE.HEIGHT - 37)
   }
 }
 
