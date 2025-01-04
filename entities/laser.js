@@ -17,4 +17,8 @@ export default class Laser extends Entity {
       }
     }, 100)
   }
+
+  destroy() {
+    this.dead = true
+  }
 }

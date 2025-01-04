@@ -1,7 +1,9 @@
-import { enemyImg } from '../assets/index.js'
+import { enemyImg, laserGreenShot } from '../assets/index.js'
 import Entity from './entity.js'
 
 import CANVAS_SIZE from '../canvasSize.js'
+
+const timeout = 400
 
 class Enemy extends Entity {
   constructor(x, y) {
@@ -11,13 +13,26 @@ class Enemy extends Entity {
 
     this.type = 'Enemy'
     let id = setInterval(() => {
-      if (this.y < CANVAS_SIZE.HEIGHT - this.height) {
+      if (this.y < CANVAS_SIZE.HEIGHT - this.height || this.dead) {
         this.y += 5
       } else {
         this.y = CANVAS_SIZE.HEIGHT
         clearInterval(id)
       }
-    }, 400)
+    }, timeout)
+  }
+
+  destroy() {
+    return new Promise((resolve) => {
+      this.img = laserGreenShot
+      this.width = 98
+      this.height = 95
+
+      setTimeout(() => {
+        this.dead = true
+        resolve()
+      }, timeout)
+    })
   }
 }
 

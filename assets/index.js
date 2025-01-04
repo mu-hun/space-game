@@ -8,3 +8,6 @@ export const starBackground = await loadTexture(
   import.meta.resolve('./starBackground.png')
 )
 export const laserImg = await loadTexture(import.meta.resolve('./laserRed.png'))
+export const laserGreenShot = await loadTexture(
+  import.meta.resolve('./laserGreenShot.png')
+)

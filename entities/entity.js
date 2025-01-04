@@ -33,12 +33,11 @@ export default class Entity {
 
   /**
    *
-   * @param {Entity} entity1
-   * @param {Entity} entity2
+   * @param {Entity} entity
    */
-  static isColliding(entity1, entity2) {
-    const rect1 = entity1.getBoundingClientRect()
-    const rect2 = entity2.getBoundingClientRect()
+  isColliding(entity) {
+    const rect1 = this.getBoundingClientRect()
+    const rect2 = entity.getBoundingClientRect()
     return (
       rect1.left < rect2.right &&
       rect1.right > rect2.left &&

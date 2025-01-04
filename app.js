@@ -18,8 +18,8 @@ const KEY_ACTIONS = {
 }
 
 const COLLISION_EVENTS = {
-  ENEMY_LASER: 'ENEMY_LASER',
-  ENEMY_PLAYER: 'ENEMY_PLAYER',
+  ENEMY_DESTROY: 'ENEMY_DESTROY',
+  PLAYER_COLLIDES_WITH_ENEMY: 'PLAYER_COLLIDES_WITH_ENEMY',
 }
 
 window.addEventListener('keydown', (event) => {
@@ -67,13 +67,34 @@ eventEmitter.on(KEY_ACTIONS[' '], () => {
   }
 })
 
-eventEmitter.on(COLLISION_EVENTS.ENEMY_LASER, (_, [laser, enemy]) => {
-  laser.dead = true
-  enemy.dead = true
+function updateEntities() {
+  const enemies = entities.filter((entity) => entity.type === 'Enemy')
+  const lasers = entities.filter((entity) => entity.type === 'Laser')
+
+  for (const enemy of enemies) {
+    if (player.isColliding(enemy)) {
+      eventEmitter.emit(COLLISION_EVENTS.PLAYER_COLLIDES_WITH_ENEMY, [enemy])
+    }
+  }
+
+  for (const laser of lasers) {
+    for (const enemy of enemies) {
+      if (laser.isColliding(enemy)) {
+        eventEmitter.emit(COLLISION_EVENTS.ENEMY_DESTROY, [laser, enemy])
+      }
+    }
+  }
+
+  entities = entities.filter((entity) => entity.dead === false)
+}
+
+eventEmitter.on(COLLISION_EVENTS.ENEMY_DESTROY, async (_, [laser, enemy]) => {
+  laser.destroy()
+  await enemy.destroy()
 })
 
-eventEmitter.on(COLLISION_EVENTS.ENEMY_PLAYER, (_, [enemy]) => {
-  enemy.dead = true
+eventEmitter.on(COLLISION_EVENTS.PLAYER_COLLIDES_WITH_ENEMY, (_, [enemy]) => {
+  // TODO: handle player life
 })
 
 let entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
