@@ -139,7 +139,10 @@ const isEnemiesAllDead = () =>
     .filter((entity) => entity.type === 'Enemy')
     .every((enemy) => enemy.dead)
 
-let entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
+/**
+ * @type {Entity[]}
+ */
+let entities = []
 
 window.onload = async () => {
   const canvas = document.getElementById('canvas')
@@ -148,17 +151,27 @@ window.onload = async () => {
   canvas.height = CANVAS_SIZE.HEIGHT
 
   const ctx = canvas.getContext('2d')
-
-  player.startAutoFire(ctx)
-
-  function drawEntities() {
-    for (const entity of entities) {
-      entity.draw(ctx)
-    }
-    player.drawAutoFire(ctx)
-  }
-
   let requestId = null
+
+  function initializeGame() {
+    entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
+    requestId = requestAnimationFrame(gameLoop)
+    player.startAutoFire(ctx)
+  }
+  initializeGame()
+
+  eventEmitter.on(STAGE_EVENTS.RESET, () => {
+    player.reset()
+    initializeGame()
+  })
+
+  eventEmitter.on(gameStatus.RESULT.WIN, () => {
+    gameStatus.endGame(ctx, gameStatus.RESULT.WIN, requestId)
+  })
+
+  eventEmitter.on(gameStatus.RESULT.LOSE, () => {
+    gameStatus.endGame(ctx, gameStatus.RESULT.LOSE, requestId)
+  })
 
   function gameLoop() {
     const pattern = ctx.createPattern(starBackground, 'repeat')
@@ -171,19 +184,11 @@ window.onload = async () => {
 
     requestId = requestAnimationFrame(gameLoop)
   }
-  gameLoop()
 
-  eventEmitter.on(gameStatus.RESULT.WIN, () => {
-    gameStatus.endGame(ctx, gameStatus.RESULT.WIN, requestId)
-  })
-
-  eventEmitter.on(gameStatus.RESULT.LOSE, () => {
-    gameStatus.endGame(ctx, gameStatus.RESULT.LOSE, requestId)
-  })
-
-  eventEmitter.on(STAGE_EVENTS.RESET, () => {
-    player.reset()
-    entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
-    requestId = requestAnimationFrame(gameLoop)
-  })
+  function drawEntities() {
+    for (const entity of entities) {
+      entity.draw(ctx)
+    }
+    player.drawAutoFire(ctx)
+  }
 }

@@ -26,6 +26,8 @@ class Player extends Entity {
 
     this.life = 3
     this.points = 0
+
+    this.autoFireIntervalId = null
   }
 
   reset() {
@@ -42,6 +44,8 @@ class Player extends Entity {
 
     this.life = 3
     this.points = 0
+
+    clearInterval(this.autoFireIntervalId)
   }
 
   decrementLife() {
@@ -75,7 +79,7 @@ class Player extends Entity {
   }
 
   startAutoFire() {
-    setInterval(() => {
+    this.autoFireIntervalId = setInterval(() => {
       this.leftLaser.push(new Laser(this.x, this.y - 10))
       this.rightLaser.push(new Laser(this.x + 90, this.y - 10))
     }, timeout)
