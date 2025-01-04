@@ -69,7 +69,11 @@ eventEmitter.on(KEY_ACTIONS[' '], () => {
 
 function updateEntities() {
   const enemies = entities.filter((entity) => entity.type === 'Enemy')
-  const lasers = entities.filter((entity) => entity.type === 'Laser')
+  const lasers = [
+    ...entities.filter((entity) => entity.type === 'Laser'),
+    ...player.leftLaser,
+    ...player.rightLaser,
+  ]
 
   for (const enemy of enemies) {
     if (player.isColliding(enemy)) {
@@ -107,10 +111,13 @@ window.onload = async () => {
 
   const ctx = canvas.getContext('2d')
 
+  player.startAutoFire(ctx)
+
   function drawEntities() {
     for (const entity of entities) {
       entity.draw(ctx)
     }
+    player.drawAutoFire(ctx)
   }
 
   ;(function gameLoop() {

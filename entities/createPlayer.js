@@ -17,6 +17,9 @@ class Player extends Entity {
     this.speed = { x: 0, y: 0 }
 
     this.cooldown = 0
+
+    this.leftLaser = []
+    this.rightLaser = []
   }
 
   fire() {
@@ -37,6 +40,32 @@ class Player extends Entity {
 
   canFire() {
     return this.cooldown === 0
+  }
+
+  startAutoFire() {
+    setInterval(() => {
+      this.leftLaser.push(new Laser(this.x, this.y - 10))
+      this.rightLaser.push(new Laser(this.x + 90, this.y - 10))
+    }, timeout)
+  }
+
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  drawAutoFire(ctx) {
+    this.leftLaser = this.leftLaser.filter(
+      (laser) => laser.y > 0 && !laser.dead
+    )
+    for (const laser of this.leftLaser) {
+      laser.draw(ctx)
+    }
+
+    this.rightLaser = this.rightLaser.filter(
+      (laser) => laser.y > 0 && !laser.dead
+    )
+    for (const laser of this.rightLaser) {
+      laser.draw(ctx)
+    }
   }
 }
 
