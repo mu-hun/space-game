@@ -27,12 +27,13 @@ export function drawPoints(ctx, points) {
 export const RESULT = {
   WIN: 'WIN',
   LOSE: 'LOSE',
+  MISSED: 'MISSED',
 }
 
 /**
  *
  * @param {CanvasRenderingContext2D} ctx
- * @param {'WIN' | 'LOSE'} status
+ * @param {'WIN' | 'LOSE' | 'MISSED'} status
  * @param {number} requestId
  */
 export function endGame(ctx, status, requestId) {
@@ -55,6 +56,13 @@ export function endGame(ctx, status, requestId) {
         ctx,
         '죽었습니다!!! - 새로운 게임을 시작하려면 [Enter] 키를 누르세요.',
         'red'
+      )
+      return
+    case RESULT.MISSED:
+      displayMessage(
+        ctx,
+        '놓쳤습니다!!! - 게임을 다시 시작하려면 [Enter] 키를 누르세요.',
+        'fuchsia'
       )
       return
     default:

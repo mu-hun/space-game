@@ -39,6 +39,10 @@ class Enemy extends Entity {
   isDestroying() {
     return this.img === laserGreenShot || this.dead
   }
+
+  isOutOfBounds() {
+    return this.y >= CANVAS_SIZE.HEIGHT
+  }
 }
 
 const MAX_PER_ROW = 5

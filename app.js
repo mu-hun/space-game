@@ -79,12 +79,21 @@ eventEmitter.on(KEY_ACTIONS[' '], () => {
 })
 
 function updateEntities() {
+  entities = entities.filter((entity) => entity.dead === false)
+
   const enemies = entities.filter((entity) => entity.type === 'Enemy')
   const lasers = [
     ...entities.filter((entity) => entity.type === 'Laser'),
     ...player.leftLaser,
     ...player.rightLaser,
   ]
+
+  const isAnyEnemyOutOfBounds = enemies.some((enemy) => enemy.isOutOfBounds())
+
+  if (isAnyEnemyOutOfBounds) {
+    eventEmitter.emit(gameStatus.RESULT.MISSED)
+    return
+  }
 
   for (const enemy of enemies) {
     if (player.isColliding(enemy)) {
@@ -99,8 +108,6 @@ function updateEntities() {
       }
     }
   }
-
-  entities = entities.filter((entity) => entity.dead === false)
 }
 
 eventEmitter.on(COLLISION_EVENTS.ENEMY_DESTROY, async (_, [laser, enemy]) => {
@@ -171,6 +178,10 @@ window.onload = async () => {
 
   eventEmitter.on(gameStatus.RESULT.LOSE, () => {
     gameStatus.endGame(ctx, gameStatus.RESULT.LOSE, requestId)
+  })
+
+  eventEmitter.on(gameStatus.RESULT.MISSED, () => {
+    gameStatus.endGame(ctx, gameStatus.RESULT.MISSED, requestId)
   })
 
   function gameLoop() {
