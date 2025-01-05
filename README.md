@@ -31,4 +31,8 @@
 
 ## 직접 플레이하기
 
-<!-- 주소 TODO -->
+<!-- prettier-ignore-start -->
+| 배포된 주소 | 배포 상태 |
+|:-:|:--:|
+| https://mu-hun.github.io/space-game/ | [![Deploy static content to Pages](https://github.com/mu-hun/space-game/actions/workflows/static.yml/badge.svg)](https://github.com/mu-hun/space-game/actions/workflows/static.yml) |
+<!-- prettier-ignore-end -->
