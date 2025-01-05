@@ -45,10 +45,11 @@ class Enemy extends Entity {
   }
 }
 
-const MAX_PER_ROW = 5
-const COLUMN_GAP = 98
-const ROW_GAP = 50
-const ENEMY_WIDTH = MAX_PER_ROW * COLUMN_GAP
+const options = {
+  MAX_PER_ROW: 5,
+  COLUMN_GAP: 98,
+  ROW_GAP: 50,
+}
 
 export const FORMATION_TYPE = {
   SQUARE: 'SQUARE',
@@ -58,8 +59,22 @@ export const FORMATION_TYPE = {
 /**
  *
  * @param {'SQUARE' | 'TRIANGLE'} formation
+ * @param {number} addPerRow
+ * @param {number} addColumnGap
+ * @param {number} addRowGap
  */
-export default function createEnemies(formation = FORMATION_TYPE.SQUARE) {
+export default function createEnemies(
+  formation = FORMATION_TYPE.SQUARE,
+  addPerRow = 0,
+  addColumnGap = 0,
+  addRowGap = 0
+) {
+  const MAX_PER_ROW = addPerRow + options.MAX_PER_ROW
+  const COLUMN_GAP = addColumnGap + options.COLUMN_GAP
+  const ROW_GAP = addRowGap + options.ROW_GAP
+
+  const ENEMY_WIDTH = MAX_PER_ROW * COLUMN_GAP
+
   const START_X = (CANVAS_SIZE.WIDTH - ENEMY_WIDTH) / 2
   const enemies = []
 

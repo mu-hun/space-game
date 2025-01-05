@@ -25,13 +25,16 @@ const COLLISION_EVENTS = {
   PLAYER_COLLIDES_WITH_ENEMY: 'PLAYER_COLLIDES_WITH_ENEMY',
 }
 
-const STAGE_EVENTS = {
-  RESET: 'RESET',
-  // TODO: 아래 단계 추가하기
-  // EASY: 'EASY',
-  // MEDIUM: 'MEDIUM',
-  // HARD: 'HARD',
-}
+const INITIALIZE_STAGE = 'INITIALIZE_STAGE'
+
+/**
+ * @type { 'EASY' | 'MEDIUM' | 'HARD'}
+ */
+let CURRENT_STAGE = gameStatus.STAGES.EASY
+/**
+ * @type { 'WIN' | 'LOSE' | 'MISSED' | null}
+ * */
+let GAME_RESULT = null
 
 window.addEventListener('keydown', (event) => {
   if (event.key in KEY_ACTIONS) {
@@ -136,9 +139,35 @@ eventEmitter.on(
 )
 
 eventEmitter.on(KEY_ACTIONS.Enter, () => {
-  if (player.dead || isEnemiesAllDead()) {
-    eventEmitter.emit(STAGE_EVENTS.RESET)
+  if (GAME_RESULT === gameStatus.RESULT.WIN) {
+    switch (CURRENT_STAGE) {
+      case gameStatus.STAGES.EASY:
+        CURRENT_STAGE = gameStatus.STAGES.MEDIUM
+        break
+      case gameStatus.STAGES.MEDIUM:
+        CURRENT_STAGE = gameStatus.STAGES.HARD
+        break
+      case gameStatus.STAGES.HARD:
+        return
+      default:
+        throw new Error('Invalid stage')
+    }
+    eventEmitter.emit(INITIALIZE_STAGE)
+    return
   }
+
+  if (
+    GAME_RESULT === gameStatus.RESULT.LOSE ||
+    GAME_RESULT === gameStatus.RESULT.MISSED
+  ) {
+    ;(function resetStage() {
+      CURRENT_STAGE = gameStatus.STAGES.EASY
+    })()
+    eventEmitter.emit(INITIALIZE_STAGE)
+    return
+  }
+
+  throw new Error('Invalid game result')
 })
 
 const isEnemiesAllDead = () =>
@@ -161,27 +190,63 @@ window.onload = async () => {
   let requestId = null
 
   function initializeGame() {
-    entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
+    switch (CURRENT_STAGE) {
+      case gameStatus.STAGES.EASY:
+        entities = [...createEnemies(FORMATION_TYPE.TRIANGLE), player]
+        break
+      case gameStatus.STAGES.MEDIUM:
+        entities = [
+          ...createEnemies(FORMATION_TYPE.TRIANGLE, 1, 10, 10),
+          player,
+        ]
+        break
+      case gameStatus.STAGES.HARD:
+        entities = [...createEnemies(FORMATION_TYPE.SQUARE, 1, 10, 10), player]
+        break
+      default:
+        throw new Error('Invalid stage')
+    }
     requestId = requestAnimationFrame(gameLoop)
     player.startAutoFire(ctx)
   }
   initializeGame()
 
-  eventEmitter.on(STAGE_EVENTS.RESET, () => {
+  eventEmitter.on(INITIALIZE_STAGE, () => {
     player.reset()
     initializeGame()
   })
 
   eventEmitter.on(gameStatus.RESULT.WIN, () => {
-    gameStatus.endGame(ctx, gameStatus.RESULT.WIN, requestId)
+    GAME_RESULT = gameStatus.RESULT.WIN
+    gameStatus.endGame(
+      ctx,
+      gameStatus.RESULT.WIN,
+      player.points,
+      CURRENT_STAGE,
+      requestId
+    )
   })
 
   eventEmitter.on(gameStatus.RESULT.LOSE, () => {
-    gameStatus.endGame(ctx, gameStatus.RESULT.LOSE, requestId)
+    GAME_RESULT = gameStatus.RESULT.LOSE
+    gameStatus.endGame(
+      ctx,
+      gameStatus.RESULT.LOSE,
+      player.points,
+      CURRENT_STAGE,
+      requestId
+    )
   })
 
   eventEmitter.on(gameStatus.RESULT.MISSED, () => {
-    gameStatus.endGame(ctx, gameStatus.RESULT.MISSED, requestId)
+    GAME_RESULT = gameStatus.RESULT.MISSED
+    gameStatus.endGame(
+      ctx,
+      gameStatus.RESULT.MISSED,
+      player.points,
+      CURRENT_STAGE,
+      requestId
+    )
   })
 
   function gameLoop() {
@@ -192,6 +257,7 @@ window.onload = async () => {
     updateEntities()
     gameStatus.drawLife(ctx, player.life)
     gameStatus.drawPoints(ctx, player.points)
+    gameStatus.drawStage(ctx, CURRENT_STAGE)
 
     requestId = requestAnimationFrame(gameLoop)
   }
